@@ -1335,6 +1335,15 @@ button.shopify-payment-button__button--unbranded {
   border-color: red;
 }
 
+/* Task-b code */
+.add-to-cart-text {
+  display: flex;
+  justify-content: center;
+}
+.add-to-cart-text p {
+  margin: 0rem 0 1.7rem;
+}
+
 /* Shopify Accelerated Checkout */
 
 shopify-accelerated-checkout {

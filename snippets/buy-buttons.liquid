@@ -92,6 +92,11 @@
             </span>
             {%- render 'loading-spinner' -%}
           </button>
+
+          <div class="add-to-cart-text">
+          <p id="inventory-status"></p>
+          </div>
+          
           {%- if show_dynamic_checkout -%}
             {{ form | payment_button }}
           {%- endif -%}
@@ -146,5 +151,53 @@
     </pickup-availability>
 
     <script src="{{ 'pickup-availability.js' | asset_url }}" defer="defer"></script>
+
+    <script id="variant-data" type="application/json">
+      [
+        {% for variant in product.variants %}
+          {
+            "id": {{ variant.id }},
+            "available": {{ variant.available | json }},
+            "option1": {{ variant.option1 | json }},
+            "inventory_quantity": {{ variant.inventory_quantity }}
+          }{% unless forloop.last %},{% endunless %}
+        {% endfor %}
+      ]
+    </script>
+
+    <script>     
+      document.addEventListener('DOMContentLoaded', function() {
+       const variants = JSON.parse(document.getElementById('variant-data').textContent);
+        const inventoryText = document.getElementById('inventory-status');
+        console.log("Variants:", variants)
+
+        function updateInventoryBySize(size) {
+          const variant = variants.find(v => v.option1 === size.trim());
+          if (!variant) return;
+
+          if (variant.inventory_quantity >= 5) {
+            inventoryText.textContent = 'Available!';
+          } else if (variant.inventory_quantity > 0) {
+            inventoryText.textContent = 'Low stock';
+          }
+        }
+
+        function setDefaultStatus() {
+          const selected = document.querySelector('input[name^="Shoe size"]:checked');
+          if(selected) {
+            updateInventoryBySize(selected.value)
+          }
+        }
+
+        setDefaultStatus();
+
+        document.addEventListener('change', function (event) {
+          if (event.target.matches('input[name^="Shoe size"]')) {
+            updateInventoryBySize(event.target.value);
+          }
+        });
+      })
+    </script>
+
   {%- endif -%}
 </div>
