@@ -87,8 +87,63 @@
       {%- endif -%}
     {%- endfor -%}
 
+    <p id="variant-metafield-text"></p>
+
+    <script type="application/json" data-variants>
+      {{ product.variants | json }}
+    </script>
+
     <script type="application/json" data-selected-variant>
       {{ product.selected_or_first_available_variant | json }}
     </script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const metafieldText = document.getElementById("variant-metafield-text");
+        const variantDataScript = document.getElementById("variant-data");
+        const defaultVariantScript = document.querySelector("[data-selected-variant]");
+
+        if (!metafieldText || !variantDataScript || !defaultVariantScript) return;
+
+        const variantData = JSON.parse(variantDataScript.textContent);
+        const defaultVariant = JSON.parse(defaultVariantScript.textContent);
+
+        function updateMetafieldTextBySize(size) {
+          const selectedVariant = variantData.find(v => v.option1 == size);
+          console.log("Selected variant:", selectedVariant);
+
+          if (selectedVariant && selectedVariant.metafields?.custom) {
+            let text = "";
+
+            switch (size) {
+              case "S":
+                text = selectedVariant.metafields.custom.small;
+                break;
+              case "M":
+                text = selectedVariant.metafields.custom.medium;
+                break;
+              case "L":
+                text = selectedVariant.metafields.custom.large;
+                break;
+            }
+            metafieldText.textContent = text;
+          } else {
+            metafieldText.textContent = "";
+          }
+        };
+
+        updateMetafieldTextBySize(defaultVariant.option1);
+
+        const radios = document.querySelectorAll("input[name^='Shoe size']");
+        radios.forEach((radio) => {
+          radio.addEventListener("change", function() {
+            const size = this.value.trim();
+            console.log("Clicked radio size:", size);
+            updateMetafieldTextBySize(size);
+          });
+        });
+      });
+    </script>
+
   </variant-selects>
 {%- endunless -%}

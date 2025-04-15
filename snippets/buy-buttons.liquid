@@ -159,7 +159,14 @@
             "id": {{ variant.id }},
             "available": {{ variant.available | json }},
             "option1": {{ variant.option1 | json }},
-            "inventory_quantity": {{ variant.inventory_quantity }}
+            "inventory_quantity": {{ variant.inventory_quantity }},
+            "metafields": {
+              "custom": {
+                "small": {{ variant.metafields.custom.small | json }},
+                "medium": {{ variant.metafields.custom.medium | json }},
+                "large": {{ variant.metafields.custom.large | json }}
+              }
+            }
           }{% unless forloop.last %},{% endunless %}
         {% endfor %}
       ]
